@@ -64,7 +64,7 @@ typedef struct
 /* PUBLIC FUNCTIONS */
 void InitRelay(void);
 void RelayDispatcher(void);
-void RelaySetStatus(EnSetCommand enSetCommand);
+void RelaySetStatus(EnSetCommand *enSetCommand);
 void RelayRepeatStatus(EnRepeatCommand *enRepeatCommand);
 
 #endif /*END __relay_control_h__*/

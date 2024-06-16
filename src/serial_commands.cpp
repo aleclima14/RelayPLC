@@ -153,7 +153,7 @@ void ParserCommand(char *command)
          token = strtok(NULL, ",");
          enSetCommand.enRelayState = GetRelayState(token);
 
-         RelaySetStatus(enSetCommand);
+         RelaySetStatus(&enSetCommand);
          break;
       }
 
