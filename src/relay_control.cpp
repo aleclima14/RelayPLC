@@ -98,10 +98,21 @@ void RelayDispatcher(void)
 
 void RelaySetStatus(EnSetCommand *enSetCommand)
 {
-   if((enSetCommand->enRelayIndex != RELAY_NULL) && (enSetCommand->enRelayState != RELAY_UNINITIALIZED))
+   if(enSetCommand->enRelayIndex != RELAY_NULL) 
    {
-      digitalWrite (stTableRelayPin[enSetCommand->enRelayIndex].u8Pin, enSetCommand->enRelayState);
+      if(enSetCommand->enRelayState != RELAY_UNINITIALIZED)
+      {
+         digitalWrite (stTableRelayPin[enSetCommand->enRelayIndex].u8Pin, enSetCommand->enRelayState);
+      }
+      else
+      {
+         if(enSetCommand->enRelayState == RELAY_UNINITIALIZED)
+         {
+            digitalWrite (stTableRelayPin[enSetCommand->enRelayIndex].u8Pin, RELAY_OFF);
+         }
+      }
    }
+   
 }
 
 void RelayRepeatStatus(EnRepeatCommand *enRepeatCommand)
@@ -111,6 +122,12 @@ void RelayRepeatStatus(EnRepeatCommand *enRepeatCommand)
       *(stTableRelayPin[enRepeatCommand->enRelayIndex].enStoreState) = enRepeatCommand->enRelayState;
       *(stTableRelayPin[enRepeatCommand->enRelayIndex].ulTimerOn) = enRepeatCommand->ulTimerOn;
       *(stTableRelayPin[enRepeatCommand->enRelayIndex].ulTimerOff) = enRepeatCommand->ulTimerOff;
+      
+      if(enRepeatCommand->enRelayState == RELAY_ON)
+      {
+         digitalWrite (stTableRelayPin[enRepeatCommand->enRelayIndex].u8Pin, RELAY_ON);
+      }
+      
       StartTimer(stTableRelayPin[enRepeatCommand->enRelayIndex].ulTimer);
    }  
    else
