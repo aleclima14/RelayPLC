@@ -14,48 +14,68 @@
 
 /* DEFINES */
 
+/* STRUCT */
+typedef struct
+{
+   EnRelayState enState;
+   ulong TimerOn;
+   ulong TimerOff;
+   ulong CurrentTimer;
+   ulong Cycles;
+   bool Repeat; 
+}StRelayConfig;
 
 /* LOCAL FUNCTIONS */
 
 
 /* GLOBAL VARIABLES */
-ulong CurrentTimerRelay1 = 0;
-ulong CurrentTimerRelay2 = 0;
-ulong CurrentTimerRelay3 = 0;
-ulong CurrentTimerRelay4 = 0;
+StRelayConfig stRelay1 = 
+{
+   .enState = RELAY_UNINITIALIZED,
+   .TimerOn = 0,
+   .TimerOff = 0,
+   .CurrentTimer = 0,
+   .Cycles = 0,
+   .Repeat = false,
+};
 
-ulong TimerOnRelay1;
-ulong TimerOnRelay2;
-ulong TimerOnRelay3;
-ulong TimerOnRelay4;
+StRelayConfig stRelay2 = 
+{
+   .enState = RELAY_UNINITIALIZED,
+   .TimerOn = 0,
+   .TimerOff = 0,
+   .CurrentTimer = 0,
+   .Cycles = 0,
+   .Repeat = false,
+};
 
-ulong TimerOffRelay1;
-ulong TimerOffRelay2;
-ulong TimerOffRelay3;
-ulong TimerOffRelay4;
+StRelayConfig stRelay3 = 
+{
+   .enState = RELAY_UNINITIALIZED,
+   .TimerOn = 0,
+   .TimerOff = 0,
+   .CurrentTimer = 0,
+   .Cycles = 0,
+   .Repeat = false,
+};
 
-EnRelayState Relay1State = RELAY_UNINITIALIZED;
-EnRelayState Relay2State = RELAY_UNINITIALIZED;
-EnRelayState Relay3State = RELAY_UNINITIALIZED;
-EnRelayState Relay4State = RELAY_UNINITIALIZED;
-
-ulong CyclesRelay1;
-ulong CyclesRelay2;
-ulong CyclesRelay3;
-ulong CyclesRelay4;
-
-bool RepeatRelay1 = false;
-bool RepeatRelay2 = false;
-bool RepeatRelay3 = false;
-bool RepeatRelay4 = false;
+StRelayConfig stRelay4 = 
+{
+   .enState = RELAY_UNINITIALIZED,
+   .TimerOn = 0,
+   .TimerOff = 0,
+   .CurrentTimer = 0,
+   .Cycles = 0,
+   .Repeat = false,
+};
 
 /* TABLES */
 static const StTableRelayPin stTableRelayPin[] = 
 {
-   {RELAY_1, RELAY_1_PIN, &Relay1State, &TimerOnRelay1, &TimerOffRelay1, &CurrentTimerRelay1, &CyclesRelay1, &RepeatRelay1},
-   {RELAY_2, RELAY_2_PIN, &Relay2State, &TimerOnRelay2, &TimerOffRelay2, &CurrentTimerRelay2, &CyclesRelay2, &RepeatRelay2},
-   {RELAY_3, RELAY_3_PIN, &Relay3State, &TimerOnRelay3, &TimerOffRelay3, &CurrentTimerRelay3, &CyclesRelay3, &RepeatRelay3},
-   {RELAY_4, RELAY_4_PIN, &Relay4State, &TimerOnRelay4, &TimerOffRelay4, &CurrentTimerRelay4, &CyclesRelay4, &RepeatRelay4},
+   {RELAY_1, RELAY_1_PIN, &stRelay1.enState, &stRelay1.TimerOn, &stRelay1.TimerOff, &stRelay1.CurrentTimer, &stRelay1.Cycles, &stRelay1.Repeat},
+   {RELAY_2, RELAY_2_PIN, &stRelay2.enState, &stRelay2.TimerOn, &stRelay2.TimerOff, &stRelay2.CurrentTimer, &stRelay2.Cycles, &stRelay2.Repeat},
+   {RELAY_3, RELAY_3_PIN, &stRelay3.enState, &stRelay3.TimerOn, &stRelay3.TimerOff, &stRelay3.CurrentTimer, &stRelay3.Cycles, &stRelay3.Repeat},
+   {RELAY_4, RELAY_4_PIN, &stRelay4.enState, &stRelay4.TimerOn, &stRelay4.TimerOff, &stRelay4.CurrentTimer, &stRelay4.Cycles, &stRelay4.Repeat},
 };
 #define RELAY_TABLE_SIZE (int)(sizeof(stTableRelayPin)/sizeof(StTableRelayPin))
 
