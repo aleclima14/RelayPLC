@@ -159,7 +159,7 @@ void ParserCommand(char *command)
 
       case REPEAT_COMMAND:
       {
-         /* repeat,relay1,off,1000,2000 */
+         /* repeat,relay1,off,1000,2000,0 */
          /* repeat,relay2,stop */
          token = strtok(NULL, ",");
          enRepeatCommand.enRelayIndex = GetRelayIndex(token);
@@ -174,11 +174,15 @@ void ParserCommand(char *command)
 
             token = strtok(NULL, ",");
             enRepeatCommand.ulTimerOff = GetTimer(token);
+
+            token = strtok(NULL, ",");
+            enRepeatCommand.ulCycles = GetTimer(token);
          }
          
          RelayRepeatStatus(&enRepeatCommand);
          break;
       }
+
       default:
       break;
    }

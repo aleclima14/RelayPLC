@@ -45,6 +45,8 @@ typedef struct
    ulong *ulTimerOn;
    ulong *ulTimerOff;
    ulong *ulTimer;
+   ulong *ulCycles;
+   bool *bRepeatInfinite;
 }StTableRelayPin;
 
 typedef struct
@@ -53,6 +55,7 @@ typedef struct
    EnRelayState enRelayState;
    ulong ulTimerOn;
    ulong ulTimerOff;
+   ulong ulCycles;
 }EnRepeatCommand;
 
 typedef struct
