@@ -22,7 +22,7 @@
 EnCommand GetCommand(const char *command);
 EnRelayIndex GetRelayIndex(const char *relay);
 EnRelayState GetRelayState(const char *state);
-ulong GetTimer(const char *timer);
+ulong GetUlongValue(const char *ulongValue);
 void ParserCommand(char *command);
 
 /* GLOBAL VARIABLES */
@@ -131,9 +131,9 @@ EnRelayState GetRelayState(const char *state)
    return enReturn; 
 }
 
-ulong GetTimer(const char *timer)
+ulong GetUlongValue(const char *ulongValue)
 {
-   return strtoul(timer, NULL, 0);
+   return strtoul(ulongValue, NULL, 0);
 }
 
 void ParserCommand(char *command)
@@ -170,13 +170,13 @@ void ParserCommand(char *command)
          if(enRepeatCommand.enRelayState != RELAY_UNINITIALIZED)
          {
             token = strtok(NULL, ",");
-            enRepeatCommand.ulTimerOn = GetTimer(token);
+            enRepeatCommand.ulTimerOn = GetUlongValue(token);
 
             token = strtok(NULL, ",");
-            enRepeatCommand.ulTimerOff = GetTimer(token);
+            enRepeatCommand.ulTimerOff = GetUlongValue(token);
 
             token = strtok(NULL, ",");
-            enRepeatCommand.ulCycles = GetTimer(token);
+            enRepeatCommand.ulCycles = GetUlongValue(token);
          }
          
          RelayRepeatStatus(&enRepeatCommand);
