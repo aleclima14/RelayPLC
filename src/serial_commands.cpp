@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include "serial_commands.h"
 #include "relay_control.h"
+#include "queue.h"
 
 /* DEFINES */
 
@@ -31,12 +32,12 @@ EnSetCommand enSetCommand;
 EnCommand enCommand;
 char SerialBuffer[BUFFER_LENGHT];
 uint8_t BufferSize = 0;
+Queue SerialQueue;
+bool bFirstQueueInitialize = false;
 
 /* CONST VARIABLES */
 
-
 /* TABLES */
-
 
 /* PUBLIC FUNCTIONS */
 /**
@@ -54,6 +55,12 @@ void ReadCommandSerial(void)
    static char bufferMessage[BUFFER_LENGHT];
    char readedByteSerial;
    bool validBuffer = false;
+
+   if(bFirstQueueInitialize == false)
+   {
+      InitializeQueue(&SerialQueue);
+      bFirstQueueInitialize = true;
+   }
 
    while (Serial.available() > 0)
    {
@@ -92,8 +99,8 @@ void ReadCommandSerial(void)
    
    if(validBuffer == true)
    {
+      EnqueueItem(&SerialQueue, SerialBuffer);
       ParserCommand(SerialBuffer);
-      
       /* Clear buffer */
       for(uint8_t i = 0; i <= BufferSize; i++)
       {
@@ -109,6 +116,7 @@ EnCommand GetCommand(const char *command)
    if (strcmp(command, "set") == 0) enReturn = SET_COMMAND;
    if (strcmp(command, "test") == 0) enReturn = TEST_COMMAND;
    if (strcmp(command, "repeat") == 0) enReturn = REPEAT_COMMAND;
+   if (strcmp(command, "help") == 0) enReturn = HELP_COMMAND;
    return enReturn;
 }
 
@@ -144,6 +152,12 @@ void ParserCommand(char *command)
    
    switch (enCommand)
    {
+      case HELP_COMMAND:
+      {
+         Serial.println(">>set command<<\r\n set,relayX,status\r\n Example: \r\n set,relay1,on\r\n for turn on relay1\r\n\r\n");
+         Serial.println(">>repeat command<<\r\n repeat,relayX,initialStatus,timeOn,timeOff,cycles\r\n Example:\r\n repeat,relay1,on,5,10,4 \r\n for 5s on, 10s off and 4 cycles\r\nOBS: use cycles = 0 to infine cycles");
+         break;
+      }
       case SET_COMMAND:
       {
          /* set,relay1,on */
@@ -170,10 +184,10 @@ void ParserCommand(char *command)
          if(enRepeatCommand.enRelayState != RELAY_UNINITIALIZED)
          {
             token = strtok(NULL, ",");
-            enRepeatCommand.ulTimerOn = GetUlongValue(token);
+            enRepeatCommand.ulTimerOn = GetUlongValue(token) * 1000;
 
             token = strtok(NULL, ",");
-            enRepeatCommand.ulTimerOff = GetUlongValue(token);
+            enRepeatCommand.ulTimerOff = GetUlongValue(token) * 1000;
 
             token = strtok(NULL, ",");
             enRepeatCommand.ulCycles = GetUlongValue(token);

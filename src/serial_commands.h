@@ -31,6 +31,7 @@ typedef enum
    SET_COMMAND = 0,
    TEST_COMMAND,
    REPEAT_COMMAND,
+   HELP_COMMAND,
    WRONG_COMMAND,
 }EnCommand;
 
