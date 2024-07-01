@@ -27,8 +27,6 @@ ulong GetUlongValue(const char *ulongValue);
 void ParserCommand(char *command);
 
 /* GLOBAL VARIABLES */
-EnRepeatCommand enRepeatCommand;
-EnSetCommand enSetCommand;
 EnCommand enCommand;
 char SerialBuffer[BUFFER_LENGHT];
 uint8_t BufferSize = 0;
@@ -100,13 +98,18 @@ void ReadCommandSerial(void)
    if(validBuffer == true)
    {
       EnqueueItem(&SerialQueue, SerialBuffer);
-      ParserCommand(SerialBuffer);
+
       /* Clear buffer */
       for(uint8_t i = 0; i <= BufferSize; i++)
       {
          SerialBuffer[i] = 0;
       }
       validBuffer = false;
+   }
+
+   if((FinishCommand() == true) && (QueueSize(&SerialQueue) > 0))
+   {
+      ParserCommand(DequeueItem(&SerialQueue));
    }
 }
 
@@ -132,10 +135,10 @@ EnRelayIndex GetRelayIndex(const char *relay)
 
 EnRelayState GetRelayState(const char *state) 
 {
-   EnRelayState enReturn = RELAY_UNINITIALIZED;
+   EnRelayState enReturn = RELAY_STOP;
    if (strcmp(state, "on") == 0) enReturn = RELAY_ON;
    if (strcmp(state, "off") == 0) enReturn = RELAY_OFF;
-   if (strcmp(state, "stop") == 0) enReturn = RELAY_UNINITIALIZED;
+   if (strcmp(state, "stop") == 0) enReturn = RELAY_STOP;
    return enReturn; 
 }
 
@@ -147,6 +150,8 @@ ulong GetUlongValue(const char *ulongValue)
 void ParserCommand(char *command)
 {
    char *token = strtok(command, ",");
+   EnRepeatCommand enRepeatCommand;
+   EnSetCommand enSetCommand;
 
    enCommand = GetCommand(token);
    
@@ -181,7 +186,7 @@ void ParserCommand(char *command)
          token = strtok(NULL, ",");
          enRepeatCommand.enRelayState = GetRelayState(token);
 
-         if(enRepeatCommand.enRelayState != RELAY_UNINITIALIZED)
+         if(enRepeatCommand.enRelayState != RELAY_STOP)
          {
             token = strtok(NULL, ",");
             enRepeatCommand.ulTimerOn = GetUlongValue(token) * 1000;

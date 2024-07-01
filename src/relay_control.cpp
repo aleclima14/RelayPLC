@@ -31,7 +31,7 @@ typedef struct
 /* GLOBAL VARIABLES */
 StRelayConfig stRelay1 = 
 {
-   .enState = RELAY_UNINITIALIZED,
+   .enState = RELAY_STOP,
    .TimerOn = 0,
    .TimerOff = 0,
    .CurrentTimer = 0,
@@ -41,7 +41,7 @@ StRelayConfig stRelay1 =
 
 StRelayConfig stRelay2 = 
 {
-   .enState = RELAY_UNINITIALIZED,
+   .enState = RELAY_STOP,
    .TimerOn = 0,
    .TimerOff = 0,
    .CurrentTimer = 0,
@@ -51,7 +51,7 @@ StRelayConfig stRelay2 =
 
 StRelayConfig stRelay3 = 
 {
-   .enState = RELAY_UNINITIALIZED,
+   .enState = RELAY_STOP,
    .TimerOn = 0,
    .TimerOff = 0,
    .CurrentTimer = 0,
@@ -61,13 +61,15 @@ StRelayConfig stRelay3 =
 
 StRelayConfig stRelay4 = 
 {
-   .enState = RELAY_UNINITIALIZED,
+   .enState = RELAY_STOP,
    .TimerOn = 0,
    .TimerOff = 0,
    .CurrentTimer = 0,
    .Cycles = 0,
    .Repeat = false,
 };
+
+static bool isCommandFinish = true;
 
 /* TABLES */
 static const StTableRelayPin stTableRelayPin[] = 
@@ -101,7 +103,7 @@ void RelayDispatcher(void)
 {
    for(int i = 0; i < RELAY_TABLE_SIZE; i++)
    {
-      if(*(stTableRelayPin[i].enStoreState) != RELAY_UNINITIALIZED)
+      if(*(stTableRelayPin[i].enStoreState) != RELAY_STOP)
       {
          if(*(stTableRelayPin[i].enStoreState) == RELAY_ON)
          {
@@ -113,13 +115,7 @@ void RelayDispatcher(void)
                if(((*(stTableRelayPin[i].ulCycles)) > 0) && (*(stTableRelayPin[i].bRepeatInfinite) == false))
                {
                   *(stTableRelayPin[i].ulCycles) -= 1;
-               }
-               else
-               {
-                  if((*(stTableRelayPin[i].ulCycles) == 0) && (*(stTableRelayPin[i].bRepeatInfinite) == false))
-                  {
-                     *(stTableRelayPin[i].enStoreState) = RELAY_UNINITIALIZED;
-                  }
+                  isCommandFinish = false;
                }
             }
          }
@@ -134,6 +130,12 @@ void RelayDispatcher(void)
                }
             }
          }
+         
+         if((*(stTableRelayPin[i].ulCycles) == 0) && (*(stTableRelayPin[i].bRepeatInfinite) == false))
+         {
+            *(stTableRelayPin[i].enStoreState) = RELAY_STOP;
+            isCommandFinish = true;
+         }
       }
    }
 }
@@ -142,17 +144,18 @@ void RelaySetStatus(EnSetCommand *enSetCommand)
 {
    if(enSetCommand->enRelayIndex != RELAY_NULL) 
    {
-      if(enSetCommand->enRelayState != RELAY_UNINITIALIZED)
+      if(enSetCommand->enRelayState != RELAY_STOP)
       {
-         digitalWrite (stTableRelayPin[enSetCommand->enRelayIndex].u8Pin, enSetCommand->enRelayState);
+         digitalWrite(stTableRelayPin[enSetCommand->enRelayIndex].u8Pin, enSetCommand->enRelayState);
       }
       else
       {
-         if(enSetCommand->enRelayState == RELAY_UNINITIALIZED)
+         if(enSetCommand->enRelayState == RELAY_STOP)
          {
-            digitalWrite (stTableRelayPin[enSetCommand->enRelayIndex].u8Pin, RELAY_OFF);
+            digitalWrite(stTableRelayPin[enSetCommand->enRelayIndex].u8Pin, RELAY_OFF);
          }
       }
+      isCommandFinish = true;
    }
 }
 
@@ -160,7 +163,7 @@ void RelayRepeatStatus(EnRepeatCommand *enRepeatCommand)
 {
    if(enRepeatCommand->enRelayIndex != RELAY_NULL)
    {
-      if((enRepeatCommand->enRelayState != RELAY_UNINITIALIZED) && (enRepeatCommand->ulTimerOn > 0) && (enRepeatCommand->ulTimerOff > 0))
+      if((enRepeatCommand->enRelayState != RELAY_STOP) && (enRepeatCommand->ulTimerOn > 0) && (enRepeatCommand->ulTimerOff > 0))
       {
          *(stTableRelayPin[enRepeatCommand->enRelayIndex].enStoreState) = enRepeatCommand->enRelayState;
          *(stTableRelayPin[enRepeatCommand->enRelayIndex].ulTimerOn) = enRepeatCommand->ulTimerOn;
@@ -169,7 +172,7 @@ void RelayRepeatStatus(EnRepeatCommand *enRepeatCommand)
          if(enRepeatCommand->ulCycles > 0)
          {
             *(stTableRelayPin[enRepeatCommand->enRelayIndex].bRepeatInfinite) = false;
-            *(stTableRelayPin[enRepeatCommand->enRelayIndex].ulCycles) = enRepeatCommand->ulCycles - 1;
+            *(stTableRelayPin[enRepeatCommand->enRelayIndex].ulCycles) = enRepeatCommand->ulCycles ;//- 1;
          }
          else
          {
@@ -181,7 +184,7 @@ void RelayRepeatStatus(EnRepeatCommand *enRepeatCommand)
 
          if(enRepeatCommand->enRelayState == RELAY_ON)
          {
-            digitalWrite (stTableRelayPin[enRepeatCommand->enRelayIndex].u8Pin, RELAY_ON);
+            digitalWrite(stTableRelayPin[enRepeatCommand->enRelayIndex].u8Pin, RELAY_ON);
          }
          StartTimer(stTableRelayPin[enRepeatCommand->enRelayIndex].ulTimer);
       }  
@@ -189,6 +192,12 @@ void RelayRepeatStatus(EnRepeatCommand *enRepeatCommand)
       {
          *(stTableRelayPin[enRepeatCommand->enRelayIndex].enStoreState) = enRepeatCommand->enRelayState;
          digitalWrite(stTableRelayPin[enRepeatCommand->enRelayIndex].u8Pin, RELAY_OFF);
+         isCommandFinish = true;
       }
    }
+}
+
+bool FinishCommand()
+{
+   return isCommandFinish;
 }

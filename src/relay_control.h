@@ -24,7 +24,7 @@ typedef enum
 {
    RELAY_ON = 0,
    RELAY_OFF,
-   RELAY_UNINITIALIZED,
+   RELAY_STOP,
 }EnRelayState;
 
 typedef enum 
@@ -69,5 +69,6 @@ void InitRelay(void);
 void RelayDispatcher(void);
 void RelaySetStatus(EnSetCommand *enSetCommand);
 void RelayRepeatStatus(EnRepeatCommand *enRepeatCommand);
+bool FinishCommand();
 
 #endif /*END __relay_control_h__*/
