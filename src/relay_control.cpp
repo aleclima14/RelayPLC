@@ -172,7 +172,7 @@ void RelayRepeatStatus(EnRepeatCommand *enRepeatCommand)
          if(enRepeatCommand->ulCycles > 0)
          {
             *(stTableRelayPin[enRepeatCommand->enRelayIndex].bRepeatInfinite) = false;
-            *(stTableRelayPin[enRepeatCommand->enRelayIndex].ulCycles) = enRepeatCommand->ulCycles ;//- 1;
+            *(stTableRelayPin[enRepeatCommand->enRelayIndex].ulCycles) = enRepeatCommand->ulCycles;
          }
          else
          {
