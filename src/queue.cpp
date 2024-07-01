@@ -53,9 +53,9 @@ void EnqueueItem(Queue *queue, const char *value)
  * @param queue 
  * @return const char* 
  */
-const char *DequeueItem(Queue *queue)
+char *DequeueItem(Queue *queue)
 {
-   const char *value = NULL;
+   char *value = NULL;
    if (QueueIsEmpty(queue) == false) 
    {
       value = queue->data[queue->front];

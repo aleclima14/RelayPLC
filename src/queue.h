@@ -35,7 +35,7 @@ typedef struct
 /* PUBLIC FUNCTIONS */
 void InitializeQueue(Queue *queue);
 void EnqueueItem(Queue *queue, const char *value);
-const char *DequeueItem(Queue *queue);
+char *DequeueItem(Queue *queue);
 uint8_t QueueSize(Queue *queue);
 
 
